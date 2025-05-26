@@ -23,6 +23,7 @@ const logs = rawData.logs || {};
  * @returns {number}
  */
 function parseTimeToMinutes(timeStr) {
+  if (!timeStr || timeStr.trim() === "") return 0;
   const [hours, minutes] = timeStr.split(":").map(Number);
   return hours * 60 + minutes;
 }
