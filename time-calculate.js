@@ -94,11 +94,24 @@ const timeList = []; // All time entries across weeks
 const leavePerWeek = []; // Leave days per week
 const weekArrays = []; // Each week's time entries
 
+// Organize data from JSON structure, merging in-house-session times
+const inHouse = rawData["in-house-session"] || {};
+
 // Organize data from JSON structure
 weekKeys.forEach((key, idx) => {
   const week = logs[key];
-  weekArrays.push(week.time);
-  timeList.push(...week.time);
+  const weekTime = week.time || [];
+  const inHouseWeek = (inHouse[key] && inHouse[key].time) || [];
+  // Merge each day's time
+  const mergedTime = weekTime.map((t, i) => {
+    const inHouseTime = inHouseWeek[i];
+    if (!inHouseTime || inHouseTime === "-") return t;
+    // Sum both times
+    const totalMins = parseTimeToMinutes(t) + parseTimeToMinutes(inHouseTime);
+    return formatMinutesToHours(totalMins);
+  });
+  weekArrays.push(mergedTime);
+  timeList.push(...mergedTime);
   leavePerWeek.push(week.leave || 0);
 });
 
